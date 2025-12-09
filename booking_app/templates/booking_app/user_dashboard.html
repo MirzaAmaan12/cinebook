@@ -1,0 +1,139 @@
+{% extends 'booking_app/base.html' %}
+
+{% block title %}User Dashboard - Theatre Booking{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-panel {
+        background: linear-gradient(135deg, #111, #222);
+        color: white;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    .stat-tile {
+        background: white;
+        border: 0;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .movie-mini {
+        border: 0;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="hero-panel mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div>
+                <p class="text-uppercase small mb-1 text-secondary">Welcome back</p>
+                <h2 class="fw-bold mb-1">{{ user.first_name|default:user.username }}</h2>
+                <p class="mb-0 text-muted">Browse movies, pick seats, and track your bookings.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'home' %}" class="btn btn-light">Browse Movies</a>
+                <a href="{% url 'my_bookings' %}" class="btn btn-outline-light">My Bookings</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-tile">
+                <p class="text-muted small mb-1">Total Bookings</p>
+                <h3 class="mb-0">{{ total_bookings }}</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-tile">
+                <p class="text-muted small mb-1">Upcoming Shows</p>
+                <h3 class="mb-0">{{ upcoming_count }}</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-tile">
+                <p class="text-muted small mb-1">Latest Booking</p>
+                {% if bookings %}
+                    <h6 class="mb-0">{{ bookings.first.movie.title }}</h6>
+                    <small class="text-muted">{{ bookings.first.movie.show_date|date:"d M Y, H:i" }}</small>
+                {% else %}
+                    <p class="mb-0 text-muted">No bookings yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h4 class="mb-0 text-dark">Now Showing</h4>
+            <a href="{% url 'home' %}" class="small text-decoration-none">See all</a>
+        </div>
+        {% if upcoming_movies %}
+            <div class="row g-3">
+                {% for movie in upcoming_movies %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card movie-mini h-100">
+                            {% if movie.poster %}
+                                <img src="{{ movie.poster.url }}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="{{ movie.title }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h6 class="text-dark">{{ movie.title }}</h6>
+                                <p class="text-muted small mb-2">{{ movie.theatre.name }} • {{ movie.show_date|date:"d M, H:i" }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-dark">₹{{ movie.price_per_seat }}</span>
+                                    <a href="{% url 'movie_detail' movie.id %}" class="btn btn-sm btn-dark">Book seats</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-secondary">No movies available right now.</div>
+        {% endif %}
+    </div>
+
+    <div>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h4 class="mb-0 text-dark">My Recent Bookings</h4>
+            <a href="{% url 'my_bookings' %}" class="small text-decoration-none">View all</a>
+        </div>
+        {% if bookings %}
+            <div class="row g-3">
+                {% for booking in bookings|slice:":4" %}
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-0 text-dark">{{ booking.movie.title }}</h6>
+                                    <span class="badge bg-success">{{ booking.get_status_display }}</span>
+                                </div>
+                                <p class="text-muted small mb-1">{{ booking.movie.theatre.name }}</p>
+                                <p class="text-muted small mb-1">Show: {{ booking.movie.show_date|date:"d M Y, H:i" }}</p>
+                                <p class="text-muted small mb-3">
+                                    Seats:
+                                    {% for seat in booking.seats.all %}
+                                        {{ seat.row }}{{ seat.column }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold text-dark">₹{{ booking.total_price }}</span>
+                                    <a href="{% url 'booking_confirmation' booking.id %}" class="btn btn-sm btn-outline-dark">View</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-secondary">You have no bookings yet.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

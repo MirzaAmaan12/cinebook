@@ -1,0 +1,407 @@
+{% extends 'booking_app/base.html' %}
+
+{% block title %}Edit Theatre Seats - {{ theatre.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .seat-config-header {
+        background: white;
+        padding: 30px 0;
+        margin-bottom: 40px;
+        border-bottom: 2px solid #eee;
+    }
+
+    .seat-config-container {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .config-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .config-subtitle {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 30px;
+    }
+
+    .seat-row-item {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 15px;
+        margin-bottom: 15px;
+        align-items: end;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
+
+    .form-group {
+        margin-bottom: 0;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #28a745;
+        box-shadow: 0 0 0 3px rgba(40,167,69,0.1);
+    }
+
+    .row-letter-select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+        transition: border-color 0.3s;
+    }
+
+    .row-letter-select:focus {
+        outline: none;
+        border-color: #28a745;
+        box-shadow: 0 0 0 3px rgba(40,167,69,0.1);
+    }
+
+    .btn-remove {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: bold;
+        transition: all 0.3s;
+        white-space: nowrap;
+    }
+
+    .btn-remove:hover {
+        background: #c82333;
+        box-shadow: 0 2px 8px rgba(220,53,69,0.3);
+    }
+
+    .btn-add-row {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: all 0.3s;
+        margin-top: 20px;
+        width: 100%;
+    }
+
+    .btn-add-row:hover {
+        background: #218838;
+        box-shadow: 0 3px 10px rgba(40,167,69,0.3);
+    }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 35px;
+    }
+
+    .btn-save {
+        flex: 1;
+        background: #333;
+        color: white;
+        border: none;
+        padding: 13px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+
+    .btn-save:hover {
+        background: #000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        transform: translateY(-2px);
+    }
+
+    .btn-cancel {
+        flex: 1;
+        background: #f0f0f0;
+        color: #333;
+        border: 1px solid #ddd;
+        padding: 13px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: bold;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s;
+    }
+
+    .btn-cancel:hover {
+        background: #e0e0e0;
+    }
+
+    .info-box {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 25px;
+        color: #004085;
+        font-size: 13px;
+    }
+
+    .info-box strong {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .preview-box {
+        background: #f9f9f9;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 25px;
+        text-align: center;
+    }
+
+    .preview-title {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+    }
+
+    .preview-seats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .preview-seat {
+        background: white;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .total-seats-info {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f0f8f5;
+        border-radius: 6px;
+        border: 1px solid #d4edda;
+        text-align: center;
+    }
+
+    .total-seats-label {
+        color: #666;
+        font-size: 12px;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+
+    .total-seats-number {
+        font-size: 28px;
+        font-weight: bold;
+        color: #28a745;
+    }
+
+    @media (max-width: 768px) {
+        .seat-config-container {
+            padding: 25px;
+        }
+
+        .seat-row-item {
+            grid-template-columns: 1fr;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="seat-config-header">
+    <div class="container">
+        <h1 style="margin-bottom: 8px; color: #333;">Edit Theatre Seats</h1>
+        <p style="color: #666; margin: 0;">{{ theatre.name }} - {{ theatre.location }}</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container" style="margin-bottom: 50px;">
+    <div class="seat-config-container">
+        <!-- Info Box -->
+        <div class="info-box">
+            <strong>📌 How it works:</strong>
+            Select a row letter (A-Z) and enter the number of seats in that row. For example: Row A with 30 seats means A1, A2, A3...A30.
+        </div>
+
+        <form method="POST" id="seat-form">
+            {% csrf_token %}
+
+            <!-- Seat Rows -->
+            <div id="seats-container">
+                {% for item in seat_rows %}
+                    <div class="seat-row-item">
+                        <div class="form-group">
+                            <label>Row Letter</label>
+                            <select class="row-letter-select" name="row[]" required>
+                                <option value="">Choose Row...</option>
+                                {% for row_letter in available_rows %}
+                                    <option value="{{ row_letter }}" {% if item.row == row_letter %}selected{% endif %}>
+                                        {{ row_letter }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Number of Seats</label>
+                            <input type="number" name="count[]" value="{{ item.count }}" min="5" max="50" required>
+                        </div>
+                        <button type="button" class="btn-remove" onclick="removeRow(this)">Remove</button>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Add Row Button -->
+            <button type="button" class="btn-add-row" onclick="addRow()">+ Add Another Row</button>
+
+            <!-- Preview -->
+            <div class="preview-box">
+                <div class="preview-title">Preview</div>
+                <div class="preview-seats" id="preview">
+                    <!-- Preview will be generated by JavaScript -->
+                </div>
+                <div class="total-seats-info">
+                    <div class="total-seats-label">Total Seats</div>
+                    <div class="total-seats-number" id="total-count">{{ theatre.total_seats }}</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+                <button type="submit" class="btn-save">✓ Save Configuration</button>
+                <a href="{% url 'owner_dashboard' %}" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const availableRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
+    function addRow() {
+        const container = document.getElementById('seats-container');
+        const rowCount = container.children.length;
+        const defaultRow = availableRows[rowCount] || 'A';
+
+        const html = `
+            <div class="seat-row-item">
+                <div class="form-group">
+                    <label>Row Letter</label>
+                    <select class="row-letter-select" name="row[]" required onchange="updatePreview()">
+                        <option value="">Choose Row...</option>
+                        ${availableRows.map(r => `<option value="${r}">${r}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Number of Seats</label>
+                    <input type="number" name="count[]" value="20" min="5" max="50" required onchange="updatePreview()">
+                </div>
+                <button type="button" class="btn-remove" onclick="removeRow(this)">Remove</button>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+        updatePreview();
+    }
+
+    function removeRow(btn) {
+        const container = document.getElementById('seats-container');
+        if (container.children.length > 1) {
+            btn.parentElement.remove();
+            updatePreview();
+        } else {
+            alert('You must have at least one row');
+        }
+    }
+
+    function updatePreview() {
+        const rows = document.querySelectorAll('select[name="row[]"]');
+        const counts = document.querySelectorAll('input[name="count[]"]');
+        const preview = document.getElementById('preview');
+        const totalCount = document.getElementById('total-count');
+
+        let total = 0;
+        let previewHTML = '';
+
+        rows.forEach((row, idx) => {
+            const rowLetter = row.value;
+            const count = parseInt(counts[idx].value) || 0;
+
+            if (rowLetter) {
+                total += count;
+                for (let i = 1; i <= count; i++) {
+                    previewHTML += `<div class="preview-seat">${rowLetter}${i}</div>`;
+                }
+            }
+        });
+
+        preview.innerHTML = previewHTML || '<p style="color: #999;">Configure rows above to see preview</p>';
+        totalCount.textContent = total;
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updatePreview();
+        
+        // Add event listeners to existing inputs
+        document.querySelectorAll('select[name="row[]"], input[name="count[]"]').forEach(el => {
+            el.addEventListener('change', updatePreview);
+        });
+    });
+</script>
+{% endblock %}

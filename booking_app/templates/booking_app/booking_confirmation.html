@@ -1,0 +1,73 @@
+{% extends 'booking_app/base.html' %}
+
+{% block title %}Booking Confirmed - Theatre Booking{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle" style="font-size: 60px; color: #28a745;"></i>
+                    </div>
+                    
+                    <h2 class="text-dark mb-2">Booking Confirmed!</h2>
+                    <p class="text-muted mb-4">Your seats have been successfully booked</p>
+                    
+                    <div class="card bg-light border-0 p-4 mb-4">
+                        <h5 class="text-dark mb-3">Booking Reference</h5>
+                        <p class="display-6 fw-bold text-dark mb-0">{{ booking.transaction_id }}</p>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 text-start">
+                            <p class="text-muted small mb-1">Movie</p>
+                            <p class="text-dark fw-bold">{{ booking.movie.title }}</p>
+                        </div>
+                        <div class="col-md-6 text-start">
+                            <p class="text-muted small mb-1">Theatre</p>
+                            <p class="text-dark fw-bold">{{ booking.movie.theatre.name }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 text-start">
+                            <p class="text-muted small mb-1">Show Date & Time</p>
+                            <p class="text-dark fw-bold">{{ booking.movie.show_date|date:"d M Y, H:i" }}</p>
+                        </div>
+                        <div class="col-md-6 text-start">
+                            <p class="text-muted small mb-1">Selected Seats</p>
+                            <p class="text-dark fw-bold">
+                                {% for seat in seats %}
+                                    {{ seat.row }}{{ seat.column }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="border-top pt-4 mb-4">
+                        <div class="row">
+                            <div class="col-6 text-start">
+                                <p class="text-muted small mb-1">Amount Paid</p>
+                                <h4 class="text-dark fw-bold mb-0">₹{{ booking.total_price }}</h4>
+                            </div>
+                            <div class="col-6 text-start">
+                                <p class="text-muted small mb-1">Status</p>
+                                <span class="badge bg-success">{{ booking.get_status_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted small mb-4">
+                        <i class="fas fa-envelope"></i> A confirmation email has been sent to {{ user.email }}
+                    </p>
+                    
+                    <a href="{% url 'my_bookings' %}" class="btn btn-dark me-2">View My Bookings</a>
+                    <a href="{% url 'home' %}" class="btn btn-light">Book More Tickets</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

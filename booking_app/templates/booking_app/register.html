@@ -1,0 +1,43 @@
+{% extends 'booking_app/base.html' %}
+
+{% block title %}Register - Theatre Booking{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5">
+                    <h2 class="text-center text-dark mb-4">Create Account</h2>
+                    
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label text-dark">{{ field.label }}</label>
+                                {% if field.field.widget.input_type == 'hidden' %}
+                                    {{ field }}
+                                {% else %}
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ field.errors }}
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        
+                        <button type="submit" class="btn btn-dark w-100">Create Account</button>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <p class="text-muted">Already have an account? <a href="{% url 'login' %}" class="text-dark fw-bold">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
